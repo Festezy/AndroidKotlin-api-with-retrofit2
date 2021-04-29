@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Aplikasi dengan API</string>
+    <string name="enter_name">Enter Name</string>
 </resources>

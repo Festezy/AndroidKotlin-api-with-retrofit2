@@ -84,24 +84,47 @@ class MainActivity : AppCompatActivity() {
     }
     //method to Update dialog
     fun updateRecordDialog(CEOModel: CEOModel) {
-        val updateDialog = Dialog(this)
+        val updateDialog = Dialog(this, R.style.Theme_Dialog)
         updateDialog.setCancelable(false)
         updateDialog.setContentView(R.layout.update_dialog)
 
         updateDialog.etUpdateName.setText(CEOModel.name)
-        updateDialog.etUpdateName.setText(CEOModel.company_name)
+        updateDialog.etUpdateCompanyName.setText(CEOModel.company_name)
 
         updateDialog.tvUpdate.setOnClickListener {
-            val name = updateDialog.etUpdateName.text.toString()
-            val companyName = updateDialog.etUpdateCompanyName.text.toString()
+            val name = updateDialog.etUpdateName!!.text.toString()
+            val companyName = updateDialog.etUpdateCompanyName!!.text.toString()
 
             if (name.isEmpty() && companyName.isEmpty()){
                 Toast.makeText(this, "Masih ada field yang kosong, tolong di lengkapi", Toast.LENGTH_LONG).show()
             } else {
+                val newCEO : CEOModel = CEOModel(null, name, companyName)
 
+                var apiInterface: ApiInterface = ApiClient().getApiClient()!!.create(ApiInterface::class.java)
+
+                var requestCall : Call<CEOModel> = apiInterface.updateCEO(newCEO, CEOModel.id!!)
+
+                requestCall.enqueue(object : Callback<CEOModel>{
+                    override fun onFailure(call: Call<CEOModel>, t: Throwable) {
+                        Toast.makeText(this@MainActivity, "Gagal Terupdate", Toast.LENGTH_LONG).show()
+                    }
+                    override fun onResponse(call: Call<CEOModel>, response: Response<CEOModel>) {
+                        if (response.isSuccessful){
+                            Toast.makeText(this@MainActivity, "Berhasil Terupdate",Toast.LENGTH_LONG).show()
+                            setupListOfDataIntoRecyclerView()
+                            etName.setText("")
+                            etCompanyName.setText("")
+                        } else {
+                            Toast.makeText(this@MainActivity, "Gagal terupdate else", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                })
             }
-
         }
+        updateDialog.tvCancel.setOnClickListener {
+            updateDialog.dismiss()
+        }
+        updateDialog.show()
     }
 
     //method to show delete alert (untuk menampilkan dialog delete)
@@ -133,7 +156,7 @@ class MainActivity : AppCompatActivity() {
                 })
         }
         builder.setNegativeButton("No"){dialog: DialogInterface?, which: Int ->
-//            dialog.dismiss()
+            dialog?.dismiss()
         }
         val alertDialog: AlertDialog = builder.create()
         alertDialog.setCancelable(false)

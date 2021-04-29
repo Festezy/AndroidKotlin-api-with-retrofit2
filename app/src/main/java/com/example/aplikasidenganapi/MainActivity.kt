@@ -1,5 +1,6 @@
 package com.example.aplikasidenganapi
 
+import android.app.Dialog
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,6 +9,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.etCompanyName
+import kotlinx.android.synthetic.main.activity_main.etName
+import kotlinx.android.synthetic.main.update_dialog.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -78,6 +82,27 @@ class MainActivity : AppCompatActivity() {
             })
         }
     }
+    //method to Update dialog
+    fun updateRecordDialog(CEOModel: CEOModel) {
+        val updateDialog = Dialog(this)
+        updateDialog.setCancelable(false)
+        updateDialog.setContentView(R.layout.update_dialog)
+
+        updateDialog.etUpdateName.setText(CEOModel.name)
+        updateDialog.etUpdateName.setText(CEOModel.company_name)
+
+        updateDialog.tvUpdate.setOnClickListener {
+            val name = updateDialog.etUpdateName.text.toString()
+            val companyName = updateDialog.etUpdateCompanyName.text.toString()
+
+            if (name.isEmpty() && companyName.isEmpty()){
+                Toast.makeText(this, "Masih ada field yang kosong, tolong di lengkapi", Toast.LENGTH_LONG).show()
+            } else {
+
+            }
+
+        }
+    }
 
     //method to show delete alert (untuk menampilkan dialog delete)
     fun deleteRecordAlertDialog(CEOModel: CEOModel) {
@@ -92,18 +117,18 @@ class MainActivity : AppCompatActivity() {
 
             var requestCall : Call<CEOModel> = apiInterface.deleteCEO(CEOModel.id!!)
                 requestCall.enqueue(object : Callback<CEOModel>{
+                    override fun onFailure(call: Call<CEOModel>?, t: Throwable) {
+                        Toast.makeText(this@MainActivity, "Gagal Terhapus", Toast.LENGTH_LONG).show()
+                    }
                     override fun onResponse(call: Call<CEOModel>, response: Response<CEOModel>) {
                         if (response.isSuccessful){
-                            Toast.makeText(this@MainActivity, "Berhasil Tersimpanh", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@MainActivity, "Berhasil Terhapus", Toast.LENGTH_LONG).show()
                             setupListOfDataIntoRecyclerView()
                             etName.setText("")
                             etCompanyName.setText("")
                         } else {
                             Toast.makeText(this@MainActivity, "gk jadi succes", Toast.LENGTH_LONG).show()
                         }
-                    }
-                    override fun onFailure(call: Call<CEOModel>, t: Throwable) {
-                        Toast.makeText(this@MainActivity, "Gagal Terhapus", Toast.LENGTH_LONG).show()
                     }
                 })
         }
@@ -113,8 +138,5 @@ class MainActivity : AppCompatActivity() {
         val alertDialog: AlertDialog = builder.create()
         alertDialog.setCancelable(false)
         alertDialog.show()
-    }
-    fun updateRecordDialog(item: CEOModel) {
-
     }
 }

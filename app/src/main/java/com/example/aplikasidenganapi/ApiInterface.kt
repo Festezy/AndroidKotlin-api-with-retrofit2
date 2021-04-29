@@ -10,6 +10,9 @@ interface ApiInterface {
     @POST("/latihanAPI/public/api/ceo")
     fun addCEO(@Body newCEOModel: CEOModel) : Call<CEOModel>
 
-    @DELETE("/latihan/public/api/ceo/{id}")
+    @DELETE("/latihanAPI/public/api/ceo/{id}")
     fun deleteCEO(@Path("id") id: Int) : Call<CEOModel>
+
+    @PATCH("/latihanAPI/public/api/ceo/{id}")
+    fun updateCEO(@Body newCEOModel: CEOModel, @Path("id")id: Int): Call<CEOModel>
 }
